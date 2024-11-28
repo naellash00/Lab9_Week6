@@ -1,0 +1,102 @@
+create database Hotel_Management_System;
+create table hotel(
+    id int primary key,
+    name varchar(20)  unique,
+    address varchar(20) unique,
+    star int check(star between 1 and 5),
+    numberOfFloors int check(numberOfFloors >= 5),
+    numberOfRooms int check(numberOfRooms >= 5),
+    numberOfStaff int check(numberOfStaff >= 3)
+);
+
+create table room(
+    number int primary key,
+    floor int,
+    availability varchar(3) check(availability = 'yes' or availability = 'no'),
+    pricePerNight int check(pricePerNight >= 20),
+    numberOfBeds int check(numberOfBeds >= 1),
+    hotelID int,
+    foreign key (hotelID) references hotel(id)
+);
+
+create table booking(
+    id int primary key,
+    payment varchar(10), check(payment = 'completed' or payment = 'incomplete'),
+    durationOfBooking int not null,
+    totalPrice int not null check(totalPrice >=1),
+    roomNumber int,
+    guestID int,
+    foreign key (roomNumber) references room(number)
+);
+ALTER TABLE booking
+DROP COLUMN guestID;
+
+
+create table guest(
+    id int primary key,
+    fullName varchar(20) not null,
+    phoneNumber varchar(10) not null check(length(phoneNumber) =10),
+    email varchar(20) not null,
+    age int not null,
+    nationality varchar(20),
+    bookingNumber int,
+    foreign key (bookingNumber) references booking(id)
+);
+
+create table staff(
+    id int primary key,
+    fullName varchar(20) not null,
+    phoneNumber varchar(10) not null check(length(phoneNumber) = 10),
+    email varchar(20) not null,
+    age int check(age >= 20),
+    position varchar(15) check(position = 'manager' or position = 'reception' or position = 'cleaner' or position = 'room service'),
+    rating int check(rating between 1 and 10),
+    salary int not null,
+    hotelID int,
+    foreign key (hotelID) references hotel(id)
+);
+
+create table roomType(
+    capacity int not null,
+    size int not null,
+    description varchar(20),
+    bedType varchar(10) check(bedType = 'single' or bedType = 'double' or bedType = 'queen'),
+    foodService varchar(10) check(foodService = 'breakfast' or foodService = 'lunch' or foodService = 'dinner'),
+    roomNumber int,
+    foreign key (roomNumber) references room(number)
+);
+
+#CRUD for hotel table
+insert into hotel values(135, 'meridian', 'riyadh-alnakheel', 4, 30, 300, 100);
+insert into hotel values(246, 'hilton', 'riyadh-faisaliah', 5, 25, 200, 90);
+update hotel set numberOfStaff = 200 where id = 246;
+delete from hotel where id = 246;
+
+#CRUD for room table
+insert into room values(1, 1, 'yes', 60, 2, 135);
+insert into room values(2, 2, 'yes', 100, 3, 135);
+insert into room values(3, 5, 'no', 60, 2, 135);
+update room set pricePerNight = 70 where number = 2;
+delete from room where number = 3;
+
+
+#CRUD for booking table:
+insert into booking values(1133, 'completed', 5, 500,1);
+insert into booking values(2244, 'completed', 7, 500,2);
+update booking set totalPrice = 600 where id =2244;
+delete from booking where id=2244;
+
+#CRUD for guest:
+insert into guest values(1357, 'fatimah khaled', '0598765432', 'fatimah@gmail.com', 25, 'saudi', 1133);
+update guest set nationality = 'saudi arabian' where id = 1357;
+delete from guest where id = 1357;
+
+#CRUD for staff:
+insert into staff values(9854, 'ibraihm abdullah', '0587632981', 'ibr@gmail.com', 22, 'reception', 7, 3000, 135);
+update staff set salary = 3500 where id = 9854;
+delete from staff where id = 9854;
+
+#CRUD for roomType table:
+insert into roomType values(2, 30, 'deluxe room', 'queen', 'breakfast', 1);
+update roomType set capacity = 3 where roomNumber = 1;
+delete from roomType where roomNumber = 1;
